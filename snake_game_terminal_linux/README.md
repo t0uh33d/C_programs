@@ -1,4 +1,4 @@
-#Snake Game on Linux Terminal
+# Snake Game on Linux Terminal
 
 ![image](https://user-images.githubusercontent.com/91345414/150123529-b8ef46a2-90f2-4cff-a710-de18c85444b9.png)
 
