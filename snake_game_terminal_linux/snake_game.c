@@ -4,174 +4,97 @@
 #include<unistd.h>
 #include<fcntl.h>
 #include<termios.h>
-int headX,headY,fruitX,fruitY,width=30,height=30,gameOver=0,direction=2,speeds=0.8i,size=0,score=0,speed=100000;
-int bodyX[30],bodyY[30];
-void render(void);
-void setupGame(void);
-void inputCheck(void);
-void moveSnake(void);
-void gameOverCheck(void);
-int kbhit(void);
-char getch(void);
-void placeFruit(void);
-void fruitCheck(void);
-main()
-{
-  setupGame();
-  placeFruit();
-  while(!gameOver)
-  {
-   render();
-   inputCheck();
-   moveSnake();
-   fruitCheck();
-   gameOverCheck();
-   usleep(speed);
-  }
-  usleep(speed);
-  system("clear");
-  printf("\n\n\n\n\t\t\tYour final Score : %5d\n\n\t\t\tThank You for playing!! (press any key to exit)\n\n\n\n",score);
-  while(!kbhit());
-  system("clear");
-}
+ //cobra
+ int cabecax, cabecay;
+ int corpox[324], corpoy[324];
+ char cabeca = 'O', corpo = 'o';
 
-void render(void)
-{
- system("clear");
- int i,j,k,p;
- for(j=0;j<=height;j++)
- {
-  for(i=0;i<=width;i++)
-  {
-    p=1;
-    if(i==0||j==0||j==height||i==width)
-      printf("*");
-    else if(i==fruitX&&j==fruitY)
-      printf("0");
-    else if(i==headX&&j==headY)
-      printf("o");
-    else
-    {
-     for(k=0;k<size;k++)
-     {
-      if(i==bodyX[k] && j==bodyY[k])
-      {
-       printf("+");
-       p=0;
-      }
-     }
-      if(p)
-      printf(" ");
+ //fruta
+ int frutax, frutay;
+ char fruta = '@';
+
+//paramentros
+int altura = 20, largura = 20,tamanho = 0, score = 0, speed = 100000, direcao = 2;
+
+//fim de jogo
+int fimdejogo = 0;
+
+ int lerinteiro() {
+    int numero;
+    char buffer[100];
+    while (1) {
+        fgets(buffer, sizeof(buffer), stdin); // Lê uma linha de entrada
+        if (sscanf(buffer, "%d", &numero) == 1) { // Verifica se foi lido um número inteiro
+            return numero;
+        } else {
+            return 10;
+        }
     }
-  }
-  printf("\n");
- }
- printf("Scored : %5d",score);
 }
 
-void placeFruit(void)
+char getch(void)
+{
+    char c;
+    system("stty raw");
+    c= getchar();
+    system("stty sane");
+    return(c);
+}
+
+int menu(exit)
+ {
+    int option = 5;
+    while (option > 3)
+    {
+    system("clear");
+    printf("BEM VINDO AO JOGO DA COBRINHA DO LINUX\n\n");
+    printf("ESCOLHA SUA OPÇÃO: \n\n");
+    //opções
+    printf("1 - COMEÇAR A JOGAR\n");
+    printf("2 - CONTROLES\n");
+    printf("0 - SAIR\n");
+    
+        option = lerinteiro();
+    
+    switch (option)
+    {
+    case 1:
+       
+        break;
+    case 2:
+        system("clear");
+        printf("\n\n\n CONTROLES: \n W: CIMA. \n A: ESQUERDA. \n S: BAIXO. \n D: DIREITA. \n\n\n ");
+        system("read -p \"PRESSIONE ENTER PARA VOLTAR AO MENU INICIAL\" continue ");
+
+        option = 5;
+        break;
+    case 0:
+        exit = 1;
+        return exit;
+
+        break;
+    default:
+        option = 5;
+        break;
+    }
+
+    }
+    return 0;
+ }
+
+void colocafruta(void)
 { 
- resetfruitX:fruitX=rand()%20;
- if(fruitX==0||fruitX==width)
- goto resetfruitX;
+    resetfruitX:
+    frutax = rand() % (largura - 2) + 2; // Posição aleatória dentro da área de jogo, excluindo as bordas
+    resetfruitY:
+    frutay = rand() % (altura - 2) + 2; // Posição aleatória dentro da área de jogo, excluindo as bordas
 
- resetfruitY:fruitY=rand()%20;
- if(fruitY==0||fruitY==height)
- goto resetfruitY;
-}
-
-void setupGame(void)
-{
- headX=height/2;
- headY=width/2;
-}
-
-void fruitCheck(void)
-{
- if(headX==fruitX && headY==fruitY)
- {
-  score+=10;
-  size++;
-  if(speed>50000)
-  speed-=500;
-  placeFruit();
- }
-}
-
-void inputCheck(void)
-{
- if(kbhit())
- {
-  char key=getch();
-  switch (key)
-  {
-   case 'w':
-    if(direction!=3)
-    direction=1;
-    break;
-   case 'd':
-    if(direction!=4)
-    direction=2;
-    break;
-   case 's':
-    if(direction!=1)
-    direction=3;
-    break;
-   case 'a':
-    if(direction!=2)
-    direction=4;
-  }
- }
-}
-
-void moveSnake(void)
-{
- int x1,x2,y1,y2,i;
- if(size==1)
- {
-  bodyX[0]=headX;
-  bodyY[0]=headY;
- }
- else
- {
-  x1=headX;
-  y1=headY;
-  for(i=0;i<size;i++)
-  {
-   x2=bodyX[i];
-   y2=bodyY[i];
-   bodyX[i]=x1;
-   bodyY[i]=y1;
-   x1=x2;
-   y1=y2;
-  }
- }
- switch (direction)
- {
-   case 1:
-    headY--;
-    break;
-   case 2:
-    headX++;
-    break;
-   case 3:
-    headY++;
-    break;
-   case 4:
-    headX--;
- }
-}
-
-void gameOverCheck(void)
-{
- int i;
- for(i=0;i<size;i++)
- {
-  if(headX==bodyX[i] && headY==bodyY[i])
-    gameOver=1;
- }
- if(headX==width||headX==0||headY==height||headY==0)
-   gameOver=1;
+    // Verificar se a fruta está sobreposta ao corpo da cobra
+    for (int i = 0; i < tamanho; i++) {
+        if (frutax == corpox[i] && frutay == corpoy[i]) {
+            goto resetfruitX; // Se estiver sobreposta, reposicione a fruta e verifique novamente
+        }
+    }
 }
 
 int kbhit(void)
@@ -199,13 +122,163 @@ int kbhit(void)
   }
 
   return 0;
+
 }
 
-char getch(void)
+void render(void)
 {
-    char c;
-    system("stty raw");
-    c= getchar();
-    system("stty sane");
-    return(c);
+ system("clear");
+ int i,j,k,p;
+ for(j=0;j<=altura;j++)
+ {
+  for(i=0;i<=largura;i++)
+  {
+    p=1;
+    if(i==0||j==0||j==altura||i==largura)
+      printf("X");
+    else if(i==frutax&&j==frutay)
+      printf("%c", fruta);
+    else if(i==cabecax&&j==cabecay)
+      printf("%c", cabeca);
+    else
+    {
+     for(k=0;k<tamanho;k++)
+     {
+      if(i==corpox[k] && j==corpoy[k])
+      {
+       printf("%c", corpo);
+       p=0;
+      }
+     }
+      if(p)
+      printf(" ");
+    }
+  }
+  printf("\n");
+ }
+ printf("Score : %5d",score);
 }
+
+void temfruta(void)
+{
+ if(cabecax==frutax && cabecay==frutay)
+ {
+  score+=10;
+  tamanho++;
+  if(speed>50000)
+  speed-=500;
+  colocafruta();
+ }
+}
+
+void inputCheck(void)
+{
+ if(kbhit())
+ {
+  char key=getch();
+  switch (key)
+  {
+   case 'w':
+    if(direcao!=3)
+    direcao=1;
+    break;
+   case 'd':
+    if(direcao!=4)
+    direcao=2;
+    break;
+   case 's':
+    if(direcao!=1)
+    direcao=3;
+    break;
+   case 'a':
+    if(direcao!=2)
+    direcao=4;
+  }
+ }
+}
+
+void moveSnake(void)
+{
+ int x1,x2,y1,y2,i;
+ if(tamanho==1)
+ {
+  corpox[0]=cabecax;
+  corpoy[0]=cabecay;
+ }
+ else
+ {
+  x1=cabecax;
+  y1=cabecay;
+  for(i=0;i<tamanho;i++)
+  {
+   x2=corpox[i];
+   y2=corpoy[i];
+   corpox[i]=x1;
+   corpoy[i]=y1;
+   x1=x2;
+   y1=y2;
+  }
+ }
+ switch (direcao)
+ {
+   case 1:
+    cabecay--;
+    break;
+   case 2:
+    cabecax++;
+    break;
+   case 3:
+    cabecay++;
+    break;
+   case 4:
+    cabecax--;
+ }
+}
+
+void gameOverCheck(void)
+{
+ int i;
+ for(i=1;i<tamanho;i++)
+ {
+  if(cabecax==corpox[i] && cabecay==corpoy[i])
+    fimdejogo=1;
+ }
+ if(cabecax==largura||cabecax==0||cabecay==altura||cabecay==0)
+   fimdejogo=1;
+  if(tamanho == 324)
+    fimdejogo=1;
+}
+
+
+
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ int main()
+ {
+    int exit = 0;
+    if(menu(exit) == 1)
+    {
+        return 0;
+    }
+    //condições iniciais.
+    cabecax = 1;
+    cabecay = 1;
+
+  colocafruta();
+  while(!fimdejogo)
+  {
+   render();
+   inputCheck();
+   moveSnake();
+   temfruta();
+   gameOverCheck();
+   usleep(speed);
+  }
+  usleep(speed);
+  system("clear");
+  printf("\n\n\n\n\t\t\tScore : %5d\n\n\t\t\tOBRIGADO POR JOGAR!!\n\n\n\n",score);
+  while(!kbhit());
+    return 0;
+ }
+
+
